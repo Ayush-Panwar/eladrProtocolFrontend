@@ -14,12 +14,17 @@ export default function Upload() {
   const [file, setFile] = useState(null);
   const [thumbnail, setThumbnail] = useState(null);
   const [status, setStatus] = useState("No File Chosen");
+  const [check, setCheck] = useState(false)
   const title = useRef(null);
   const description = useRef(null);
   const { user } = useSelector((state) => ({ ...state }));
   const navigate = useNavigate();
   const container = useRef();
   const [spaceLeft, setSpaceLeft] = useState();
+
+  const handleCheckClick = () => {
+    setCheck(!check)
+  }
 
   useEffect(() => {
     function handleWindowResize() {
@@ -62,6 +67,7 @@ export default function Upload() {
     try {
       const currentTitle = title.current.value;
       const currentDesc = description.current.value;
+      const gig = check
 
       if (!currentTitle) {
         alert("Please provide a title.");
@@ -120,6 +126,7 @@ export default function Upload() {
             fileHash: fileHash,
             fileType: fileType,
             thumbnailHash: thumbHash,
+            isGig: gig
           },
           {
             headers: {
@@ -134,10 +141,11 @@ export default function Upload() {
         const dbRecord = {
           vidHash: fileHash,
           metaHash: metaHash,
-          wallet: "addr1_dummy",
+          wallet: user.wallet_address,
           title: currentTitle,
           description: currentDesc,
           hashThumbnail: thumbHash,
+          isGig: gig
         };
         const response3 = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/database`,
@@ -152,6 +160,7 @@ export default function Upload() {
         setStatus("Upload Complete.");
         setFile(null);
         setThumbnail(null);
+        setCheck(false);
         title.current.value = null;
         description.current.value = null;
 
@@ -244,6 +253,9 @@ export default function Upload() {
                 </button>
               </div>
             )}
+          </div>
+          <div className="gig_radio">
+            <h2><input type="checkbox" checked={check} onChange={handleCheckClick}/>&nbsp;Mark as gig</h2>
           </div>
         </div>
         <button className="upload_btn" onClick={uploadFile}>

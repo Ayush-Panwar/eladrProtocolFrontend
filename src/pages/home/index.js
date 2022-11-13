@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import axios from "axios";
 import { postsReducer } from "../../reducers/reducers";
 import Header from "../../components/header";
@@ -7,6 +7,7 @@ import "./style.css";
 import Footer from "../../components/footer";
 
 export default function Home() {
+  const [page, setPage] = useState(1)
   const [{ loading, error, feeds }, dispatch] = useReducer(postsReducer, {
     loading: false,
     feeds: [],
@@ -21,7 +22,7 @@ export default function Home() {
     try {
       dispatch({ type: "FEEDS_REQUEST" });
       const { data } = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/files`
+        `${process.env.REACT_APP_BACKEND_URL}/files/${page.toString()}`
       );
 
       dispatch({ type: "FEEDS_SUCCESS", payload: data });
